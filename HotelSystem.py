@@ -18,7 +18,7 @@ class HotelSystem:
             print('2. Add room to hotel')
             print('3. Create customer')
             print('4. Book room')
-            print('5. Cancle booking')
+            print('5. Cancel booking')
             print('6. Add to blacklist')
             print('7. Remove from blacklist')
             print('0. Exit\n')
@@ -74,7 +74,7 @@ class HotelSystem:
                 beds = int(input('Enter count of beds: '))
                 amenities = input('Enter amenities (comma-separated): ').split(',')
                 max_guests = int(input('Enter maximum number of guests: '))
-                price = float(input('Enter price per night: '))
+                price = float(input('Enter price per hour: '))
                 new_room = Room.Room(number, type, beds, amenities, max_guests, price)
                 hotel.add_room(new_room)
                 print(f'Room {number} successfully added to {hotel_name} hotel!')
@@ -83,22 +83,25 @@ class HotelSystem:
 
     def create_customer(self):
         name = input('\nEnter customer name: ')
-        nick_name = input('Enter nick name: ')
-        for customer in self.customers:
-            if customer.nick_name == nick_name:
-                print(f'Error: {nick_name} already bussied!')
         email = input('Enter customer email: ')
         phone = input('Enter cutomer number phone: ')
-        customer = Customer.Customer(name, nick_name, email, phone)
+
+        for customer in self.customers:
+            if customer.email == email:
+                print(f'Email {email} already bussied!')
+            if customer.phone == phone:
+                print(f'Error: {phone} already bussied!')
+
+        customer = Customer.Customer(name, email, phone)
         self.customers.append(customer)
         print(f'Customer {name} successfully added!')
 
     def book_room(self):
-        customer_nick_name = input('\nEnter customer nick name: ')
-        customer = self.find_customer(customer_nick_name)
+        customer_phone = input('\nEnter customer phone number: ')
+        customer = self.find_customer(customer_phone)
 
         if not customer:
-            print(f'Error: Customer {customer.name} does not exist!')
+            print(f'Error: Customer with {customer_phone} phone number not found!')
             return
 
         if customer.black_listed:
@@ -137,15 +140,17 @@ class HotelSystem:
             room.avaible = False
             print(f'Room {room_number} successfully booked by {customer.name}. From {check_in} to {check_out}.')
             customer.booking.append(booking)
+            total_price = booking.calculate_price()
+            print(f'Total price: {total_price}')
             return booking
 
 
     def cancel_booking(self):
-        customer_nick_name = input('\nEnter customer nick name: ')
-        customer = self.find_customer(customer_nick_name)
+        customer_phone = input('\nEnter customer phone number: ')
+        customer = self.find_customer(customer_phone)
 
         if not customer:
-            print(f'Error: Customer {customer_nick_name} does not exist!')
+            print(f'Error: Customer with {customer_phone} phone number not found!')
             return
 
         if not customer.booking:
@@ -179,11 +184,11 @@ class HotelSystem:
         print(f'Booking successfully canceled!')
 
     def add_to_blacklist(self):
-        customer_nick_name = input('\nEnter customer nick name to add to black list: ')
-        customer = self.find_customer(customer_nick_name)
+        customer_phone = input('\nEnter customer phone number to add to black list: ')
+        customer = self.find_customer(customer_phone)
         
         if not customer:
-            print(f'Error: Customer with nick name {customer_nick_name} not found.')
+            print(f'Error: Customer with {customer_phone} phone number not found!')
 
         if customer.booking:
             print('Clearing active bookings for customer...')
@@ -193,11 +198,13 @@ class HotelSystem:
         print(f'Customer {customer.name} has been added to the blacklist.')
 
     def remove_from_blacklist(self):
-        customer_nick_name = input('\nEnter customer nick name to remove from black list: ')
-        customer = self.find_customer(customer_nick_name)
+        customer_phone = input('\nEnter customer phone number to remove from black list: ')
+        customer = self.find_customer(customer_phone)
 
         if not customer:
-            print(f'Error: Customer with nick name {customer_nick_name} not found.')
+            print(f'Error: Customer with {customer_phone} phone number not found!')
+            return
+
             
         customer.black_listed = False
         print(f'Customer {customer.name} has been removed from the blacklist.')
@@ -214,11 +221,12 @@ class HotelSystem:
         for hotel in self.hotels:
             for room in hotel.rooms:
                 if room.avaible:
-                    print(f'Name: {room.number}. Nick name: {room.type}. Beds: {room.beds}. Amenities: {room.amenities.__str__()}')
+                    amenities_str = ', '.join(room.amenities)
+                    print(f'Room number: {room.number}. Name: {room.type}. Beds: {room.beds}. Amenities: {amenities_str}. Max guests: {room.max_guests}')
 
     def get_all_customers(self):
         for customer in self.customers:
-            print(f'{customer.name} - {customer.nick_name}. Email: {customer.email}. Phone: {customer.phone}. Banned {'Banned' if customer.black_listed else 'Not banned'}. Bookings: {len(customer.booking)}')
+            print(f'{customer.name}. Email: {customer.email}. Phone: {customer.phone}. Banned: {'Banned' if customer.black_listed else 'Not banned'}. Bookings: {len(customer.booking)}')
 
     def validate_date(self, booking):
         now = datetime.now()
@@ -258,9 +266,9 @@ class HotelSystem:
                 return room
         return None
 
-    def find_customer(self, nick_name):
+    def find_customer(self, phone):
         for customer in self.customers:
-            if customer.nick_name == nick_name:
+            if customer.phone == phone:
                 return customer
         return None
 
