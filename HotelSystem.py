@@ -23,7 +23,7 @@ class HotelSystem:
             print('7. Remove from blacklist')
             print('0. Exit\n')
 
-            action = input('Choose your action: ')
+            action = input('Choose your action: ').strip()
 
             if action == '1':
                 self.get_hotels()
@@ -52,7 +52,7 @@ class HotelSystem:
                 print('Error: Incorrect action was entered!')
 
     def create_hotel(self):
-        name = input('\nEnter hotel name: ')
+        name = input('\nEnter hotel name: ').strip()
         for h in self.hotels:
             if name == h.name:
                 print(f'Error: Hotel "{name}" already exists!')
@@ -62,19 +62,19 @@ class HotelSystem:
         print(f'Hotel "{name}" successfully added!')
 
     def add_room(self):
-        hotel_name = input('\nEnter hotel name: ')
+        hotel_name = input('\nEnter hotel name: ').strip()
         for hotel in self.hotels:
             if hotel_name == hotel.name:
-                number = input('Enter room number: ')
+                number = input('Enter room number: ').strip()
                 for room in hotel.rooms:
                     if number == room.number:
                         print(f'Error: Room with number {number} already exists!')
                         return
-                type = input('Enter room type: ')
-                beds = int(input('Enter count of beds: '))
-                amenities = input('Enter amenities (comma-separated): ').split(',')
-                max_guests = int(input('Enter maximum number of guests: '))
-                price = float(input('Enter price per hour: '))
+                type = input('Enter room type: ').strip()
+                beds = int(input('Enter count of beds: ')).strip()
+                amenities = input('Enter amenities (comma-separated): ').split(',').strip()
+                max_guests = int(input('Enter maximum number of guests: ')).strip()
+                price = float(input('Enter price per hour: ')).strip()
                 new_room = Room.Room(number, type, beds, amenities, max_guests, price)
                 hotel.add_room(new_room)
                 print(f'Room {number} successfully added to {hotel_name} hotel!')
@@ -82,9 +82,9 @@ class HotelSystem:
         print(f'Error: Hotel "{hotel_name}" does not exist!')
 
     def create_customer(self):
-        name = input('\nEnter customer name: ')
-        email = input('Enter customer email: ')
-        phone = input('Enter cutomer number phone: ')
+        name = input('\nEnter customer name: ').strip()
+        email = input('Enter customer email: ').strip()
+        phone = input('Enter cutomer number phone: ').strip()
 
         for customer in self.customers:
             if customer.email == email:
@@ -97,7 +97,7 @@ class HotelSystem:
         print(f'Customer {name} successfully added!')
 
     def book_room(self):
-        customer_phone = input('\nEnter customer phone number: ')
+        customer_phone = input('\nEnter customer phone number: ').strip()
         customer = self.find_customer(customer_phone)
 
         if not customer:
@@ -110,8 +110,12 @@ class HotelSystem:
 
         self.get_hotels()
 
-        hotel_name = input('Enter hotel name: ')
+        hotel_name = input('Enter hotel name: ').strip()
         hotel = self.find_hotel(hotel_name)
+
+        if not any(room.avaible for hotel in self.hotels for room in hotel.rooms):
+            print(f'Error: In hotel {hotel_name} has no available rooms!')
+            return
         
         if not hotel:
             print(f'Error: Hotel {hotel_name} does not exist!')
@@ -119,7 +123,7 @@ class HotelSystem:
 
         self.get_avaible_room()
 
-        room_number = input('Enter room number: ')
+        room_number = input('Enter room number: ').strip()
         room = self.find_room(hotel, room_number)
         
         if not room:
@@ -130,9 +134,9 @@ class HotelSystem:
             print(f'Error: Room {room_number} is already booked!')
             return
 
-        check_in = input('Enter check-in date (YYYY.MM.DD HH:MM): ')
-        check_out = input('Enter check-out date (YYYY.MM.DD HH:MM): ')
-        guests = int(input('Enter count of guests: '))
+        check_in = input('Enter check-in date (YYYY.MM.DD HH:MM): ').strip()
+        check_out = input('Enter check-out date (YYYY.MM.DD HH:MM): ').strip()
+        guests = int(input('Enter count of guests: ')).strip()
 
         booking = Booking.Booking(room, customer, check_in, check_out, guests)
         
@@ -146,7 +150,7 @@ class HotelSystem:
 
 
     def cancel_booking(self):
-        customer_phone = input('\nEnter customer phone number: ')
+        customer_phone = input('\nEnter customer phone number: ').strip()
         customer = self.find_customer(customer_phone)
 
         if not customer:
@@ -165,7 +169,7 @@ class HotelSystem:
         for i, booking in enumerate(customer.booking):
             print(f"{i + 1}. Room: {booking.room.number}, Check-in: {booking.check_in}, Check-out: {booking.check_out}, Guests: {booking.guests}")
 
-        choice = input("Enter the number of the booking you want to cancel: ")
+        choice = input("Enter the number of the booking you want to cancel: ").strip()
 
         if not choice.isdigit():
             print("Error: Invalid choice! Please enter a valid number.")
@@ -184,7 +188,7 @@ class HotelSystem:
         print(f'Booking successfully canceled!')
 
     def add_to_blacklist(self):
-        customer_phone = input('\nEnter customer phone number to add to black list: ')
+        customer_phone = input('\nEnter customer phone number to add to black list: ').strip()
         customer = self.find_customer(customer_phone)
         
         if not customer:
@@ -198,7 +202,7 @@ class HotelSystem:
         print(f'Customer {customer.name} has been added to the blacklist.')
 
     def remove_from_blacklist(self):
-        customer_phone = input('\nEnter customer phone number to remove from black list: ')
+        customer_phone = input('\nEnter customer phone number to remove from black list: ').strip()
         customer = self.find_customer(customer_phone)
 
         if not customer:
