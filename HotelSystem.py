@@ -71,10 +71,10 @@ class HotelSystem:
                         print(f'Error: Room with number {number} already exists!')
                         return
                 type = input('Enter room type: ').strip()
-                beds = int(input('Enter count of beds: ')).strip()
-                amenities = input('Enter amenities (comma-separated): ').split(',').strip()
-                max_guests = int(input('Enter maximum number of guests: ')).strip()
-                price = float(input('Enter price per hour: ')).strip()
+                beds = int(input('Enter count of beds: '))
+                amenities = input('Enter amenities (comma-separated): ').split(',')
+                max_guests = int(input('Enter maximum number of guests: '))
+                price = float(input('Enter price per hour: '))
                 new_room = Room.Room(number, type, beds, amenities, max_guests, price)
                 hotel.add_room(new_room)
                 print(f'Room {number} successfully added to {hotel_name} hotel!')
@@ -136,7 +136,7 @@ class HotelSystem:
 
         check_in = input('Enter check-in date (YYYY.MM.DD HH:MM): ').strip()
         check_out = input('Enter check-out date (YYYY.MM.DD HH:MM): ').strip()
-        guests = int(input('Enter count of guests: ')).strip()
+        guests = int(input('Enter count of guests: '))
 
         booking = Booking.Booking(room, customer, check_in, check_out, guests)
         
@@ -150,6 +150,7 @@ class HotelSystem:
 
 
     def cancel_booking(self):
+        self.get_all_customers()
         customer_phone = input('\nEnter customer phone number: ').strip()
         customer = self.find_customer(customer_phone)
 
@@ -194,12 +195,16 @@ class HotelSystem:
         if not customer:
             print(f'Error: Customer with {customer_phone} phone number not found!')
 
+        for booking in customer.booking:
+            booking.room.avaible = True
+        
         if customer.booking:
             print('Clearing active bookings for customer...')
             customer.booking = []
 
         customer.black_listed = True
         print(f'Customer {customer.name} has been added to the blacklist.')
+
 
     def remove_from_blacklist(self):
         customer_phone = input('\nEnter customer phone number to remove from black list: ').strip()
