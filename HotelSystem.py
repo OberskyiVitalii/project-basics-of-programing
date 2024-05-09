@@ -53,10 +53,11 @@ class HotelSystem:
 
     def create_hotel(self):
         name = input('\nEnter hotel name: ').strip()
-        for h in self.hotels:
-            if name == h.name:
+        for hotel in self.hotels:
+            if name == hotel.name:
                 print(f'Error: Hotel "{name}" already exists!')
                 return
+            
         hotel = Hotel.Hotel(name)
         self.hotels.append(hotel)
         print(f'Hotel "{name}" successfully added!')
@@ -70,6 +71,7 @@ class HotelSystem:
                     if number == room.number:
                         print(f'Error: Room with number {number} already exists!')
                         return
+                    
                 type = input('Enter room type: ').strip()
                 beds = int(input('Enter count of beds: '))
                 amenities = input('Enter amenities (comma-separated): ').split(',')
@@ -89,8 +91,10 @@ class HotelSystem:
         for customer in self.customers:
             if customer.email == email:
                 print(f'Email {email} already bussied!')
+                return
             if customer.phone == phone:
                 print(f'Error: {phone} already bussied!')
+                return
 
         customer = Customer.Customer(name, email, phone)
         self.customers.append(customer)
@@ -205,7 +209,6 @@ class HotelSystem:
         customer.black_listed = True
         print(f'Customer {customer.name} has been added to the blacklist.')
 
-
     def remove_from_blacklist(self):
         customer_phone = input('\nEnter customer phone number to remove from black list: ').strip()
         customer = self.find_customer(customer_phone)
@@ -213,11 +216,9 @@ class HotelSystem:
         if not customer:
             print(f'Error: Customer with {customer_phone} phone number not found!')
             return
-
             
         customer.black_listed = False
         print(f'Customer {customer.name} has been removed from the blacklist.')
-
 
     def get_hotels(self):
         print("\nList of Hotels:")
